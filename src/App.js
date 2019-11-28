@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./Components/Header";
 import "./App.css";
+//import List from "./Components/List";
 
 class App extends React.Component {
   state = {
@@ -9,22 +10,26 @@ class App extends React.Component {
         name: "Nessa",
         img:
           "https://i.pinimg.com/originals/39/6f/14/396f14bd9c68652906500047d677356c.jpg",
-        cuteness: 6
+        cuteness: 6,
+        personality: ["Sleepy", "Hungry"]
       },
       {
         name: "Bowser",
         img:
           "https://cdn.royalcanin-weshare-online.io/pCJJPmYBaxEApS7LeAbn/v1/ed7h-how-to-buy-a-puppy-hero-dog?w=1440&auto=compress&fm=jpg",
-        cuteness: 10
+        cuteness: 10,
+        personality: ["Energetic", "Hungry"]
       },
       {
         name: "Barney",
         img:
           "http://cdn.akc.org/content/article-body-image/beagle2_cute_puppies.jpg",
-        cuteness: 9
+        cuteness: 9,
+        personality: ["Energetic", "Cuddly"]
       }
     ],
-    selectedPuppy: "Bowser",
+    puppiesToDisplay: [],
+    selectedPuppy: null,
     sortBy: "asc"
   };
 
@@ -34,18 +39,16 @@ class App extends React.Component {
 
   sortByCuteness = () => {
     this.setState(currentState => {
-      console.log(currentState);
       const newPuppies = [...currentState.puppies];
       currentState.sortBy === "asc"
         ? (currentState.sortBy = "desc")
         : (currentState.sortBy = "asc");
 
       let num = 1;
-
       currentState.sortBy === "asc" ? (num = 1) : (num = -1);
 
       return {
-        puppies: newPuppies.sort((a, b) => {
+        puppiesToDisplay: newPuppies.sort((a, b) => {
           return a.cuteness > b.cuteness ? num : -num;
         })
       };
@@ -55,21 +58,42 @@ class App extends React.Component {
   removePuppy = name => {
     this.setState(currentState => {
       return {
-        puppies: currentState.puppies.filter(puppy => {
+        puppiesToDisplay: currentState.puppiesToDisplay.filter(puppy => {
           return puppy.name !== name;
         })
       };
     });
   };
 
-  upvoteCuteness = name => {
+  upvoteCuteness = puppyName => {
     this.setState(currentState => {
       const newPuppies = [...currentState.puppies];
       return newPuppies.map(puppy => {
-        return puppy.name === name
+        return puppy.name === puppyName
           ? (puppy.cuteness = puppy.cuteness + 1)
           : null;
       });
+    });
+  };
+
+  filterPersonality = puppyPersonality => {
+    this.setState(currentState => {
+      const newPuppies = [...currentState.puppies];
+
+      return puppyPersonality !== "ChoosePersonality"
+        ? {
+            puppiesToDisplay: newPuppies.filter(puppy => {
+              return puppy.personality.includes(puppyPersonality);
+            })
+          }
+        : { puppiesToDiplay: newPuppies };
+    });
+  };
+
+  showAllPuppies = () => {
+    this.setState(currentState => {
+      const newPuppies = [...currentState.puppies];
+      return { puppiesToDisplay: newPuppies };
     });
   };
 
@@ -77,9 +101,23 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header name="FEND" />
+        <button onClick={this.showAllPuppies}>Show All Puppies</button>
+        <br></br>
+        <br></br>
         <button onClick={this.sortByCuteness}>Sort puppies by cuteness</button>
+        <br></br>
+        <select
+          className="puppyPersonalities"
+          onChange={event => this.filterPersonality(event.target.value)}
+        >
+          <option value="ChoosePersonality">Choose a Personality</option>
+          <option value="Hungry">Hungry</option>
+          <option value="Sleepy">Sleepy</option>
+          <option value="Energetic">Energetic</option>
+          <option value="Cuddly">Cuddly</option>
+        </select>
         <ul>
-          {this.state.puppies.map(puppy => {
+          {this.state.puppiesToDisplay.map(puppy => {
             return (
               <li key={puppy.name}>
                 <p>{puppy.name}</p>
@@ -103,7 +141,7 @@ class App extends React.Component {
                   onClick={event => this.removePuppy(puppy.name)}
                   id={this.state.selectedPuppy}
                 >
-                  Remove pup
+                  Send Puppy to the farm
                 </button>
               </li>
             );
@@ -112,12 +150,6 @@ class App extends React.Component {
       </div>
     );
   }
-  // toggleImages = event => {
-  // VERY GOOD
-  // this.setState(currentState => {
-  //   return { showImages: !currentState.showImages };
-  // });
-  // };
 }
 
 export default App;
