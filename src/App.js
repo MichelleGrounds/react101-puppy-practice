@@ -1,7 +1,9 @@
 import React from "react";
 import Header from "./Components/Header";
 import "./App.css";
-//import List from "./Components/List";
+import Dropdown from "./Components/Dropdown";
+import List from "./Components/List";
+import Button from "./Components/Button";
 
 class App extends React.Component {
   state = {
@@ -98,55 +100,28 @@ class App extends React.Component {
   };
 
   render() {
+    if (this.state.puppiesToDisplay.length === 0) {
+      this.showAllPuppies();
+    }
+
     return (
       <div className="App">
         <Header name="FEND" />
-        <button onClick={this.showAllPuppies}>Show All Puppies</button>
+        <Button method={this.showAllPuppies} text="Show All Puppies" />
         <br></br>
         <br></br>
-        <button onClick={this.sortByCuteness}>Sort puppies by cuteness</button>
+        <Button method={this.sortByCuteness} text="Sort puppies by cuteness" />
         <br></br>
-        <select
-          className="puppyPersonalities"
-          onChange={event => this.filterPersonality(event.target.value)}
-        >
-          <option value="ChoosePersonality">Choose a Personality</option>
-          <option value="Hungry">Hungry</option>
-          <option value="Sleepy">Sleepy</option>
-          <option value="Energetic">Energetic</option>
-          <option value="Cuddly">Cuddly</option>
-        </select>
-        <ul>
-          {this.state.puppiesToDisplay.map(puppy => {
-            return (
-              <li key={puppy.name}>
-                <p>{puppy.name}</p>
-                {this.state.selectedPuppy === puppy.name && (
-                  <img src={puppy.img} alt="cute pup" />
-                )}
-                <p>cuteness: {puppy.cuteness}</p>
-                <button
-                  id={puppy.name}
-                  onClick={event => this.selectPuppy(puppy.name)}
-                >
-                  Select Pup
-                </button>
-                <button
-                  onClick={event => this.upvoteCuteness(puppy.name)}
-                  id={this.state.selectedPuppy}
-                >
-                  Upvote Cuteness
-                </button>
-                <button
-                  onClick={event => this.removePuppy(puppy.name)}
-                  id={this.state.selectedPuppy}
-                >
-                  Send Puppy to the farm
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+
+        <Dropdown filterPersonality={this.filterPersonality} />
+
+        <List
+          items={this.state.puppiesToDisplay}
+          selectedPuppy={this.state.selectedPuppy}
+          upvoteCuteness={this.upvoteCuteness}
+          selectPuppy={this.selectPuppy}
+          removePuppy={this.removePuppy}
+        />
       </div>
     );
   }
